@@ -1,2 +1,8 @@
 # sankowski_et_al_human_CAMs
 Codebook for the analysis of human CAMs
+
+The codebook consists of scripts that are intended to run in a consecutive fashion starting at 0_setup.R and then proceeding. The functions.R script contains custom functions used for the present analysis.
+
+## 1_seurat_10x.R
+This script contains the code to load the 10x data of FACS-sorted CD45+ cells from human Leptomeninges (n=4 samples) and Choroid plexus (n=3 samples). Genes that are present in at least 5 cells and cells with at least 500 features are included. Then cells with more than 25% mitochondrial gene content are removed. 10,000 variable genes are used for data integration. Seurat integration is achieved using the FindIntegrationAnchors function followed by function calls for UMAP calculation clustering etc. The optimal cluster resolution was chosen using visual inspection of the clustree function output. Cell type assignment was conducted using the Azimuth algorithm containing human PBMCs. The Azimuth functionality with brain cells did not detect brain cells. Unfortunately, the human PBMC-based cell type assignment did not work properly for CAMs (they were classified as CD14 monocytes, erythrocytes and platelets). Specifically, the issue with erythrocytes and platelets is that we sorted for dapi-positive cells that had nuclei. So we had had to manually correct it by chaning the file cell type assignment to the most common cell type in the respective cluster. The patient IDs were assigned using a SNP-based in silico deconvolution algorithm calls sc-split. These were assigned to the data before saving the seurat object.
+
