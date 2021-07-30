@@ -278,6 +278,21 @@ both %>% ggplot(aes(x=norm_abundance,color=molecule)) +
   
 ggsave(file.path("plots", "others", "celseq_cd206", "ecdf_plots_transcriptome_index_data.pdf"), useDingbats=F)
 
+#plot violin plots of genes and cell cycle state
+markers <- c("S.Score","G2M.Score","KCNQ1OT1")
+
+walk(markers, function(x){
+  plt <- VlnPlot(all, x) +
+    scale_fill_manual(values = c(colors_pat, colors_many, colors_fig)[-2]) +
+    theme_pubclean() +
+    theme(text=element_text(size=30),
+          legend.position = "none") +
+    labs(x="Cluster")
+  print(plt)
+  
+  ggsave(file.path("plots", "umap", "celseq_cd206", paste0(x,"_violin_plot.pdf")), useDingbats=F, height = 11, width = 11)
+})
+
 #volcano plots
 #compare clusters 9 and 10
 if (!file.exists(file.path("data", "analysis_output_10x", "all_diffgenes_cl9_cl10.RData"))) {

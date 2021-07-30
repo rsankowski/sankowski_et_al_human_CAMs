@@ -292,3 +292,20 @@ plot_index <- function(gene, .index=index_all, point_size=5, log=T) {
   return(plot)
 }
 
+plot_continuous <- function(param, .index=.ent, point_size=4) {
+  l <- .index[[param]] + 0.1
+  mi <- min(l, na.rm = T)
+  ma <- max(l, na.rm = T)
+  ColorRamp <- colorRampPalette(c("darkblue","lightblue2","yellow","red2"))(100)
+  ColorLevels <- seq(mi, ma, length = length(ColorRamp))
+  v <- round((l - mi)/(ma - mi) * 99 + 1, 0)
+  
+  kk <- bind_cols(data.frame('l'=l), .index[,c('UMAP_1', 'UMAP_2')]) %>% arrange(l)
+  
+  plot <- ggplot(na.omit(kk), aes(UMAP_1, UMAP_2, color = l)) +
+    geom_point(size = point_size, pch = 19, stroke=0.25) +
+    scale_color_gradientn('', colors = ColorRamp) +
+    theme_void() +
+    labs(title = paste(param, collapse = ','))
+  return(plot)
+}

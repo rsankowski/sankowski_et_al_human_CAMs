@@ -26,6 +26,9 @@ dir.create(file.path("data", "azimuth_fetal"))
 dir.create(file.path("data","analysis_output_10x_cams","GO_terms_cams"))
 dir.create(file.path("data","analysis_output_10x_cams","GO_terms_cams", "bp"))
 dir.create(file.path("data","analysis_output_10x_cams","GO_terms_cams", "mf"))
+dir.create(file.path("data","Star_SoloOut"))
+dir.create(file.path("data","10x_velocyto_output"))
+dir.create(file.path("data","protein_validation_cams"))
 dir.create("R")
 dir.create("plots")
 dir.create(file.path("plots", "QC"))
@@ -85,7 +88,12 @@ list.of.packages <- c(
   "ggpubr",
   "DescTools",
   "ggrepel",
-  "cellity"
+  "cellity",
+  "velocyto.R",
+  "scales",
+  "pagoda2",
+  "RaceID",
+  "FateID"
   
 )
 
