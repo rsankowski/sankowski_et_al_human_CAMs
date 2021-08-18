@@ -29,6 +29,7 @@ dir.create(file.path("data","analysis_output_10x_cams","GO_terms_cams", "mf"))
 dir.create(file.path("data","Star_SoloOut"))
 dir.create(file.path("data","10x_velocyto_output"))
 dir.create(file.path("data","protein_validation_cams"))
+dir.create(file.path("data","ctrl_cytof"))
 dir.create("R")
 dir.create("plots")
 dir.create(file.path("plots", "QC"))
@@ -50,6 +51,9 @@ dir.create(file.path("plots", "others","10x_cams"))
 dir.create(file.path("plots", "others","celseq_cd206"))
 dir.create(file.path("plots", "others","celseq_fetal"))
 dir.create(file.path("plots", "others","celseq_gbm"))
+dir.create(file.path("plots","umap","ctrl_cytof"))
+dir.create(file.path("plots","others","ctrl_cytof"))
+dir.create(file.path("plots","heatmaps","ctrl_cytof"))
 
 # the data object SC_NT2.rda is in the Microglia_Fillatreau folder
 
@@ -93,7 +97,8 @@ list.of.packages <- c(
   "scales",
   "pagoda2",
   "RaceID",
-  "FateID"
+  "FateID",
+  "tidyquant"
   
 )
 

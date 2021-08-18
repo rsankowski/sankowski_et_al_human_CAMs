@@ -119,9 +119,9 @@ hyper_test_n <- function(data = df, var1 = "Cluster", var2 = "Region") {
   for (i in unique(data[[var2]])) {
     data2 <- data
     data2[[var2]] <- factor(ifelse(data2[[var2]] == i, i, paste0("non_",i)), levels = c(i, paste0("non_",i)))
-    clusters <- as_tibble(table(data2[[`var1`]]), .name_repair = 'unique')
+    clusters <- as_tibble(table(data2[[var1]]), .name_repair = 'unique')
     colnames(clusters) <- c(var1, 'cluster_size')
-    vars <- as_tibble(table(data2[,var1], data2[,var2]), .name_repair = 'unique')
+    vars <- as_tibble(table(data2[[var1]], data2[[var2]]), .name_repair = 'unique')
     colnames(vars) <- c(var1, var2, "freq_var2")
     vars_wide <- spread(vars, var2, freq_var2)
     
@@ -294,11 +294,11 @@ plot_index <- function(gene, .index=index_all, point_size=5, log=T) {
 
 plot_continuous <- function(param, .index=.ent, point_size=4) {
   l <- .index[[param]] + 0.1
-  mi <- min(l, na.rm = T)
-  ma <- max(l, na.rm = T)
+  .l <- (l-min(l))/(max(l)-min(l))
+  #mi <- min(.l, na.rm = T)
+  #ma <- max(.l, na.rm = T)
   ColorRamp <- colorRampPalette(c("darkblue","lightblue2","yellow","red2"))(100)
-  ColorLevels <- seq(mi, ma, length = length(ColorRamp))
-  v <- round((l - mi)/(ma - mi) * 99 + 1, 0)
+  ColorLevels <- seq(0, 1, length = length(ColorRamp))
   
   kk <- bind_cols(data.frame('l'=l), .index[,c('UMAP_1', 'UMAP_2')]) %>% arrange(l)
   
@@ -309,3 +309,5 @@ plot_continuous <- function(param, .index=.ent, point_size=4) {
     labs(title = paste(param, collapse = ','))
   return(plot)
 }
+
+

@@ -5,7 +5,7 @@ library(ggbeeswarm)
 library(ggpubr)
 library(RColorBrewer)
 
-source("bin/functions.R")
+source("R/functions.R")
 
 load(file.path("data","protein_validation_cams","protein_valid_cumulative_counts.RData")) 
 
@@ -16,7 +16,7 @@ prot_all$Compartment2 <- ifelse(prot_all$Localization == "CP Macs", "cpMΦ",
                                                      ifelse(prot_all$Localization == "Men", "mMΦ",prot_all$Compartment))))) %>%
   factor(levels = c("Micr", "pvMΦ", "cpMΦ", "CP_epi", "mMΦ", "dMΦ"))
 
-prot_all$Antigen <- factor(prot_all$Antigen, levels = c("CD206_IBA1", "SIGLEC1_CD206", "SPP1_Iba1","S100A6_CD206"))
+prot_all$Antigen <- factor(prot_all$Antigen, levels = c("CD206_IBA1", "SIGLEC1_CD206", "SPP1_Iba1","S100A6_CD206","CD1C_IBA1","SPP1_Iba1"))
 
 #define comparisons
 my_comparisons <- apply(expand.grid("pvMΦ",c("Micr",  "cpMΦ", "CP_epi", "mMΦ", "dMΦ"), stringsAsFactors = F), 1, list)
@@ -28,11 +28,12 @@ cols <- c(brewer.pal(4,"Set1"))
 my_cols <- c()
 my_cols[5:6] <- cols[3:2]
 my_cols[1:2] <- colors_fig[c(1,3)]
-my_cols[3:4] <- c("#D9D9D9","#525252")
+my_cols[3:4] <- c("#CB4154","#EE7942")
 
 
-prot_all %>%
-  filter(Antigen == "CD206_IBA1") %>%
+walk(unique(prot_all$Antigen), function(x) {
+  plt <- prot_all %>%
+  filter(Antigen == x) %>%
   ggplot(aes(x= Compartment2, y=median_ratio*100, fill=Compartment2)) +
   geom_quasirandom(size=15, pch=21) +
   stat_summary(fun = "median", geom="crossbar", color="black") +
@@ -47,4 +48,8 @@ prot_all %>%
   stat_compare_means(comparisons = my_comparisons, hide.ns = T, size=10) +
   labs(y="% pos. cells", x=element_blank()) 
 
-ggsave(file.path("plots","others","10x_cams","dotplot_ctrl_iba1_cd206.pdf"), useDingbats=F, height = 8, width=8)
+  print(plt)
+  
+ggsave(file.path("plots","others","10x_cams",paste("dotplot_ctrl_iba1",x,".pdf", sep="_")), useDingbats=F, height = 8, width=8)
+})
+s
