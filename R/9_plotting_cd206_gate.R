@@ -93,7 +93,7 @@ ggsave(file.path("plots","others","celseq_cd206","clusters_compartment_marimekko
 metadata %>% 
   na.omit() %>% 
   hyper_test_n(var1="seurat_clusters", var2="Compartment") %>% 
-    write_csv(file.path("data", "analysis_output_10x", "cluster_compartment_hyper_test.csv"))
+    write_csv(file.path("data", "analysis_output_cd206_gate", "cluster_compartment_hyper_test.csv"))
 
 #plot celltypes
 #define colors 
@@ -124,7 +124,7 @@ ggsave(file.path("plots","others","celseq_cd206","clusters_celltype_cor.pdf"), u
 metadata %>% 
   na.omit() %>% 
   hyper_test_n(var1="seurat_clusters", var2="celltype_cor") %>% 
-  write_csv(file.path("data", "analysis_output_10x", "cluster_celltype_cor_hyper_test.csv"))
+  write_csv(file.path("data", "analysis_output_cd206_gate", "cluster_celltype_cor_hyper_test.csv"))
 
 #plot clusters
 DimPlot(all,pt.size = 4, label = T) +
@@ -295,20 +295,20 @@ walk(markers, function(x){
 
 #volcano plots
 #compare clusters 9 and 10
-if (!file.exists(file.path("data", "analysis_output_10x", "all_diffgenes_cl9_cl10.RData"))) {
+if (!file.exists(file.path("data", "analysis_output_cd206_gate", "all_diffgenes_cl9_cl10.RData"))) {
   all_c9c10genes <- FindMarkers(all, 
                                 ident.1 = "9",
                                 ident.2 = "10",
                                 loMenc.threshold = 0.01,
                                 min.pct = 0.01) 
   
-  save(all_c9c10genes, file = file.path("data", "analysis_output_10x", "all_diffgenes_cl9_cl10.RData"))
+  save(all_c9c10genes, file = file.path("data", "analysis_output_cd206_gate", "all_diffgenes_cl9_cl10.RData"))
 } else {
-  load(file.path("data", "analysis_output_10x", "all_diffgenes_cl9_cl10.RData"))
+  load(file.path("data", "analysis_output_cd206_gate", "all_diffgenes_cl9_cl10.RData"))
 }
 
 #export suppl table 
-write.csv(all_c9c10genes, file.path("data", "analysis_output_10x","Table_S_volcano_10x_cl9_cl10.csv"))
+write.csv(all_c9c10genes, file.path("data", "analysis_output_cd206_gate","Table_S_volcano_10x_cl9_cl10.csv"))
 
 #remove unannotated genes
 all_c9c10genes <- all_c9c10genes %>%

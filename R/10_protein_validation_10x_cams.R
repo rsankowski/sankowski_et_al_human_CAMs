@@ -46,10 +46,11 @@ walk(unique(prot_all$Antigen), function(x) {
         text = element_text(size=30)) +
   scale_fill_manual(values = my_cols) +
   stat_compare_means(comparisons = my_comparisons, hide.ns = T, size=10) +
-  labs(y="% pos. cells", x=element_blank()) 
+  labs(y="% pos. cells", x=element_blank()) +
+    expand_limits(y=c(0,100))
 
   print(plt)
   
 ggsave(file.path("plots","others","10x_cams",paste("dotplot_ctrl_iba1",x,".pdf", sep="_")), useDingbats=F, height = 8, width=8)
 })
-s
+

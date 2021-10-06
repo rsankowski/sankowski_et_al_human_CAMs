@@ -310,4 +310,63 @@ plot_continuous <- function(param, .index=.ent, point_size=4) {
   return(plot)
 }
 
+plotheatmap2 <- function (x, xpart = NULL, xcol = NULL, xlab = TRUE, xgrid = FALSE, 
+                          ypart = NULL, ycol = NULL, ylab = TRUE, ygrid = FALSE, cex = 1) 
+{
+  mi <- min(x, na.rm = TRUE)
+  ma <- max(x, na.rm = TRUE)
+  pardefault <- par()
+  layout(matrix(data = c(1, 2), nrow = 1, ncol = 2), widths = c(5, 
+                                                                1), heights = c(5, 1))
+  ColorRamp <- rev(colorRampPalette(brewer.pal(n = 7, name = "RdYlBu"))(100))
+  ColorLevels <- seq(mi, ma, length = length(ColorRamp))
+  if (mi == ma) {
+    ColorLevels <- seq(0.99 * mi, 1.01 * ma, length = length(ColorRamp))
+  }
+  par(mar = c(3, 5, 2.5, 2))
+  image(t(as.matrix(1)), col = ColorRamp, axes = FALSE, ylim = c(-0.02, 1))
+  box()
+  set.seed(20)
+  if (!is.null(xpart)) {
+    tmp <- c()
+    width <- (1/length(xpart))/2
+    k <- (0:(length(xpart) - 1)/(length(xpart) - 1))
+    rect(k - width, rep(-0.02, length(xpart)), k + width, 
+         rep(-0.005, length(xpart)), col = xcol[xpart], border = NA)
+    for (u in unique(xpart)) {
+      ol <- (0:(length(xpart) - 1)/(length(xpart) - 1))[xpart == 
+                                                          u]
+      tmp <- append(tmp, mean(ol))
+      delta <- 0.5/(length(xpart) - 1)
+      if (xgrid & max(ol) < 1) 
+        abline(v = max(ol) + delta, col = "grey", lty = 2)
+    }
+    if (xlab) 
+      axis(1, at = tmp, labels = unique(xpart), cex.axis = cex)
+  }
+  set.seed(20)
+  if (!is.null(ypart)) {
+    tmp <- c()
+    for (u in unique(ypart)) {
+      ol <- (0:(length(ypart) - 1)/(length(ypart) - 1))[ypart == 
+                                                          u]
+      if (!is.null(ycol)) 
+        points(rep(0, length(ol)), ol, col = ycol[u + 
+                                                    1], pch = 15, cex = 0.75)
+      tmp <- append(tmp, mean(ol))
+      delta <- 0.5/(length(ypart) - 1)
+      if (ygrid & max(ol) < 1) 
+        abline(a = max(ol) + delta, b = 0, col = "grey", 
+               lty = 2)
+    }
+    if (ylab) 
+      axis(2, at = tmp, labels = unique(ypart), cex.axis = cex, 
+           las = 1)
+  }
+  par(mar = c(10, 2, 2.5, 2))
+  image(1, ColorLevels, matrix(data = ColorLevels, ncol = length(ColorLevels), 
+                               nrow = 1), col = ColorRamp, xlab = "", ylab = "", xaxt = "n")
+  layout(1)
+  par(mar = pardefault$mar)
+}
 

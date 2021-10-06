@@ -84,7 +84,8 @@ show.velocity.on.embedding.cor(embUMAP,rvel.cd,n=300,scale='sqrt',cell.colors=ac
 
 
 show.velocity.on.embedding.cor(embUMAP,rvel.cd,n=300,scale='sqrt',cell.colors=ac(cell.colors,alpha=0.8),
-                               cex=0.8,arrow.scale=2,arrow.lwd=1,fixed.arrow.length=T,cc = x$cc)
+                               cex=0.8,arrow.scale=2,arrow.lwd=1,fixed.arrow.length=T,cc = x$cc) +
+  theme_void()
 
 pdf(file.path("plots","umap","10x_cams","velocity_umap.pdf"), useDingbats = F, width = 11.2, height = 8.11)
 show.velocity.on.embedding.cor(embUMAP,rvel.cd,n=300,scale='sqrt',cell.colors=ac(cell.colors,alpha=0.2),

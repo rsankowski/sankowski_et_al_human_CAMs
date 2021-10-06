@@ -133,15 +133,15 @@ y    <- ltr@sc@cpart[n$f]
 fcol <- sc@fcol
 plotheatmap(ps$all.z,xpart=y,xcol=fcol,ypart=ps$nodes,xgrid=FALSE,ygrid=TRUE,xlab=FALSE)
 
-pdf(file.path("plots","others","10x_cams","cams-trajectory-heatmap.pdf"), width = 8.57, height = 5.79, useDingbats = F)
+pdf(file.path("plots","heatmaps","10x_cams","cams-trajectory-heatmap.pdf"), width = 8.57, height = 5.79, useDingbats = F)
 plotheatmap(ps$all.z,xpart=y,xcol=fcol,ypart=ps$nodes,xgrid=FALSE,ygrid=TRUE,xlab=FALSE)
 dev.off()
 
-pdf(file.path("plots","others","10x_cams","outline-cams-trajectory-heatmap.pdf"), width = 8.57, height = 5.79, useDingbats = F)
+pdf(file.path("plots","heatmaps","10x_cams","outline-cams-trajectory-heatmap.pdf"), width = 8.57, height = 5.79, useDingbats = F)
 plotheatmap2(ps$all.z,xpart=y,xcol=fcol,ypart=ps$nodes,xgrid=FALSE,ygrid=TRUE,xlab=FALSE)
 dev.off()
 
-png(file.path("plots","others","10x_cams","map-cams-trajectory-heatmap.png"))
+png(file.path("plots","heatmaps","10x_cams","map-cams-trajectory-heatmap.png"))
 image(t(as.matrix(ps$all.z)), col = rev(colorRampPalette(brewer.pal(n = 7, name = "RdYlBu"))(100)), axes = FALSE, ylim = c(-0.02,1))
 dev.off()
 

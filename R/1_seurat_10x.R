@@ -147,4 +147,14 @@ rownames(men) <- paste(rownames(men),"2",sep="_")
 both <- rbind(cp, men)
 all$Patient_ID <- both[rownames(all[[]]),]
 
+#cell cycle scoring
+# A list of cell cycle markers, from Tirosh et al, 2015, is loaded with Seurat.  We can
+# segregate this list into markers of G2/M phase and markers of S phase
+s.genes <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+
+# Create our Seurat object and complete the initalization steps
+all <- CellCycleScoring(all, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
+Idents(all) <- all$seurat_clusters
+
 save(all, file = file.path("data", "men_cp_seurat_10x.RData"))

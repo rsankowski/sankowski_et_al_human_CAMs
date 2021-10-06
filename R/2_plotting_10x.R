@@ -6,6 +6,7 @@ library(Polychrome)
 library(fishualize)
 library(ggpubr)
 library(ggrepel)
+library(tidyquant)
 
 source(file.path("R", "functions.R"))
 
@@ -53,9 +54,10 @@ hyper_test_n(metadata, var1="seurat_clusters", var2="Compartment") %>%
   write_csv(file.path("data", "analysis_output_10x", "cluster_compartment_hyper_test.csv"))
 
 #plot celltypes
-DimPlot(all, group.by = "Celltype", pt.size = 2) +
-  scale_color_manual(values = unname(glasbey)[-1]) +
+DimPlot(all, group.by = "Celltype", pt.size = 2, label=T) +
+  #scale_color_manual(values = unname(glasbey)[-1]) +
   #scale_color_fish(option = "Centropyge_loricula", discrete = T) +
+  scale_color_manual(values = c(colors_many[-c(21,22)], colors_fig)) +
   theme_void()
 
 ggsave(file.path("plots", "umap", "10x", "celltypes.pdf"), useDingbats=F)
@@ -110,15 +112,45 @@ meta2 %>%
 ggsave(file.path("plots","others","10x","celltypes_donut.pdf"), useDingbats=F)
 
 meta3 %>%
-  ggplot(aes(x=2, y=mean_n,fill=Celltype)) +
+  group_by(Compartment, Cell_lineage) %>% 
+  summarise(cum_n = sum(mean_n)) %>% 
+  ggplot(aes(x=2, y=cum_n,fill=Cell_lineage)) +
   geom_bar(position = 'fill', stat = 'identity', color='black', lwd=0.1) +
   coord_polar(theta='y', start=0) +
   theme_void() +
-  scale_fill_manual(values=unname(glasbey)[-1]) +
+  scale_fill_tq() +
   facet_wrap(~Compartment) +
   xlim(0.5, 2.5)
 
 ggsave(file.path("plots","others","10x","celltypes_donut_means.pdf"), useDingbats=F)
+
+meta4 %>% 
+  ggplot(aes(Compartment, mean_n, fill=Compartment)) +
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width=0) +
+  geom_point(pch=21, size=5) +
+  facet_wrap(~Cell_lineage, nrow=1) +
+  stat_compare_means(method = "t.test")
+
+meta2 %>% 
+  ggplot(aes(Compartment, freq, fill=Compartment)) +
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width=0) +
+  geom_point(pch=21, size=5) +
+  facet_wrap(~Celltype, scales = "free") +
+  stat_compare_means()
+
+#stat testing
+meta4 <- meta2 %>% 
+  group_by(Patient_ID, Compartment, Cell_lineage) %>% 
+  summarise(mean_n = mean(freq))#
+wilcox.test(mean_n ~ Compartment + Cell_lineage, data = meta4)
+
+
+meta3 %>%
+  group_by(Compartment, Cell_lineage) %>% 
+  summarise(cum_n = sum(mean_n)) %>% 
+  hyper_test_n(var1 = "Compartment",var2 = "Cell_lineage")
 
 #marimekko plots celltypes
 mosaicGG2(metadata, "Celltype", "Compartment") +
@@ -144,15 +176,15 @@ walk(unique(metadata$Cell_lineage), function(x){
 })
 
 #Heatmaps
-if (!file.exists("data/diffgenes_10x.csv")) {
+if (!file.exists( file.path("data", "analysis_output_10x","diffgenes_10x.csv"))) {
   
   all.markers<-FindAllMarkers(all,only.pos=F,min.pct=.2,loMenc.threshold=.2,return.thresh = 0.05) #,only.pos=T,min.pct=.25,loMenc.threshold=.25,return.thresh = 0.05
   
-  save(all.markers, file = file.path("data","diffgenes_10x.RData"))
-  write_csv(all.markers, file.path("data","diffgenes_10x.csv"))
+  save(all.markers, file = file.path("data", "analysis_output_10x","diffgenes_10x.RData"))
+  write_csv(all.markers, file.path("data", "analysis_output_10x","diffgenes_10x.csv"))
   
 } else {
-  all.markers <- read_csv( "data/diffgenes_10x.csv")
+  all.markers <- read_csv( file.path("data", "analysis_output_10x","diffgenes_10x.csv"))
 }
 
 all.markers <- all.markers[!grepl("^(HTRA|LIN|EEF|CTC-|MIR|CTD-|AC0|RP|FOS|JUN|MTRNR|MT-|XIST|DUSP|ZFP36|RGS|PMAIP1|HSP|NEAT1|HIST|MALAT1|RP)", all.markers$gene),]
@@ -196,13 +228,28 @@ signature_genes <- data.frame("monocytes"=c('CCR2', 'CLEC12A', 'PLAC8', 'FCN1', 
                               "oligodendrocyte"=c('MBP',  'MOG', 'MAG', 'PLP1', NA),
                               "bcells"=c('CD79A', 'IGHG4', 'IGLL5', NA, NA),
                               "astrocyte"=c("MenAP", "HEPACAM","SOX9","AQP4",NA),
-                              "apc"=c("CD74", "CD80", "CD86", "HLA-DRA", "CD40"), stringsAsFactors = F)
+                              "apc"=c("CD74", "CD80", "CD86", "HLA-DRA", "CD40"),
+                              "pDC"=c("IL3RA","LILRA4","TCF4","SELL","LTB"),
+                              "cDC1"=c("XCR1", "CLEC9A","CADM1", "IRF8","BATF3"),
+                              "cDC2"=c("FCER1A", "CLEC10A", "CD1C","CST7","CCR6"),
+                              "MigDCs"= c("CCR7", "LAMP3", "SAMSN1",NA,NA),
+                              "Endothelial Cells"=c("HSPG2","PLVAP","FLT1","VWF","CD34"),
+                              stringsAsFactors = F)
 
 for (i in colnames(signature_genes)) {
   plt <- plot_expmap_seurat(na.omit(signature_genes[[i]]), point_size = 2, object = all, .retain_cl = levels(all)) + labs(subtitle= paste0(i,' Signature'))
   print(plt)
   ggsave(file.path("plots", "umap", "10x", paste0(i,"_signature_cp.pdf")), useDingbats=F)
 }
+
+#plot s score and g2m score
+walk(c("S.Score","G2M.Score"), function(x) {
+  FeaturePlot(all, x, pt.size = 2) +
+  scale_color_gradientn(colors = c("darkblue","lightblue2","yellow","red2")) +
+  theme_void()
+  
+  ggsave(file.path("plots", "umap", "10x", paste0(x,".pdf")), useDingbats=F)
+  })
 
 #volcano plots
 #compare clusters 9 and 10
@@ -423,3 +470,6 @@ all_men_cp_volcano <- ggplot(all_men_cp_genes, aes(x=avg_log2FC, y= -log10(p_val
 all_men_cp_volcano 
 
 ggsave(file.path("plots", "others", "all", "men_cp_volcano.pdf"), useDingbats=F)
+
+#export data
+write.csv(tibble(Cell_ID=rownames(all[[]]), UMAP_1 = all@reductions$umap@cell.embeddings[,1], UMAP_2 = all@reductions$umap@cell.embeddings[,2], all[[]][,c(2:7,18:24)]), file.path("data", "analysis_output_10x", "Table_S1_metadata_10x.csv"), row.names = F)
